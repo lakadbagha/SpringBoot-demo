@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://bootswatch.com/4/cerulean/bootstrap.min.css" rel="stylesheet">
+        <link href="https://getbootstrap.com/docs/4.0/examples/sign-in/signin.css" rel="stylesheet">
+        <title>Welcome</title>
+    </head>
+    <body class="text-center">
+
+        <!-- container -->
+        <div class="container">
+            <div class="row">
+                <form class="form-signin">
+                    <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+                    <label for="userName" class="sr-only">UserName</label>
+                    <input type="text" id="userName" class="form-control" placeholder="userName" required autofocus>
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                    <button class="btn btn-lg btn-primary btn-block signIn" type="submit">Sign in</button>
+                    <button class="btn btn-lg btn-secondary btn-block signUp" type="submit">Sign Up</button>
+                    
+                </form>
+            </div>
+            <div class="alert alert-dismissible alert-danger cols-sm-4">
+                <strong>Error!</strong> <label class="errorMessage"></label>
+            </div>
+            <p class="mt-5 mb-3 text-muted">Demo by Deepak Kumar Maurya</p>
+        </div>
+        <script src="./script/jquery.js"></script>
+        <script>
+            $(document).ready(function (){
+               $(".alert").hide(); 
+            });
+            $(".signIn").click(function (e) {
+                e.preventDefault();
+                var userId = $("#userName").val();
+                var password = $("#inputPassword").val();
+                var Login = {"userName": userId, "password": password};
+                $.ajax({
+                    url: "login",
+                    data: JSON.stringify(Login),
+                    error: function (e) {
+                        console.log(e);
+                    },
+                    success: function (data) {
+                        if (data.result === "success.") {
+                            window.location.href = "homePage";
+                        } else{
+                            $(".errorMessage").text(data.result);
+                            $(".alert").show();
+                        }
+                        console.log(data);
+                    },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    type: "POST",
+                    cache: false,
+                    crossDomain: true
+                });
+            });
+
+            $(".signUp").click(function (e) {
+                e.preventDefault();
+                window.location.href = "signup";
+            });
+        </script>
+    </body>
+</html>

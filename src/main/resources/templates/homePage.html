@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://bootswatch.com/4/cerulean/bootstrap.min.css" rel="stylesheet">
+        <title>Home</title>
+
+        <script src="./script/jquery.js"></script>
+        <script src="./script/datatables/dataTables.min.js"></script>
+        <link href="./script/stylesheet/dataTables.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">DASHBOARD</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+        </nav>
+        <div class="jumbotron">
+            <div class="table-responsive" style="margin-top:20px;">
+                <table id="tblPatientDiagnosed" class="table table-striped table-hover tblProductsData">
+                    <thead>
+                        <tr>
+                            <th class="text-center" width="20%">USER ID</th>
+                            <th class="text-center" width="30%">USER NAME</th>
+                            <th class="text-center" width="40%">ADDRESS</th>
+                            <th class="text-center" width="40%">ACTION</th>
+                        </tr>
+                    </thead>            
+                </table>
+            </div>
+        </div>
+
+        <div class="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('.modal').hide()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" method="post" action="#">
+                            <input type="hidden" class="form-control" name="userId" id="userId"/>
+                            <input type="hidden" class="form-control" name="createdDate" id="createdDate"/>
+                            <div class="form-group">
+                                <label for="name" class="cols-sm-2 control-label">Your Name</label>
+                                <div class="cols-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                        <input type="text" class="form-control" name="name" id="name"  placeholder="Enter your Name"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="username" class="cols-sm-2 control-label">Username</label>
+                                <div class="cols-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                                        <input type="text" class="form-control" name="userName" id="userName"  placeholder="Enter your Username"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="cols-sm-2 control-label">Your Address</label>
+                                <div class="cols-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                                        <input type="text" class="form-control" name="address" id="address"  placeholder="Enter your Address"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="cols-sm-2 control-label">Password</label>
+                                <div class="cols-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                        <input type="password" class="form-control" name="password" id="password"  placeholder="Enter your Password"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary updateUser">Save changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="$('.modal').hide()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var userData;
+            $(document).ready(function () {
+                fetchUserData();
+
+            });
+
+            function fetchUserData() {
+                $.ajax({
+                    url: "/getAllUsers",
+                    error: function (e) {
+                        alert("Data fetch failed. Please try again.");
+                    },
+                    success: function (data) {
+                        var result = JSON.stringify(data);
+                        console.log(result);
+                        if (result.length < 3)
+                            alert("No data Found.");
+                        else {
+                            userData=data;
+                            setTableData(data);
+                        }
+                    },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    type: "GET",
+                    cache: false,
+                    crossDomain: true
+                });
+            }
+            function setTableData(data) {
+                var table = document.getElementById('tblPatientDiagnosed');
+                var rows = table.rows.length;
+                var cell = -1;
+                for (var i = 0; i < data.length; i++) {
+                    var row = table.insertRow(rows++);
+                    var cell1 = row.insertCell(++cell);
+                    cell1.innerHTML = data[i].userId;
+                    var cell2 = row.insertCell(++cell);
+                    cell2.innerHTML = data[i].userName;
+                    var cell3 = row.insertCell(++cell);
+                    cell3.innerHTML = data[i].address;
+                    var cell4 = row.insertCell(++cell);
+                    cell4.innerHTML = '<button class="btn btn-outline-primary btn-sm" onclick="editUserData('+i+')">Edit</button><button class="btn btn-outline-warning btn-sm" onclick="deleteUser('+i+')">Delete</button>';
+                }
+            }
+
+
+            function editUserData(data) {
+                $("#userName").val(userData[data].userName);
+                $("#name").val(userData[data].name);
+                $("#address").val(userData[data].address);
+                $("#userId").val(userData[data].userId);
+                $("#password").val(userData[data].password);
+                $("#createdDate").val(userData[data].createdDate);
+                $(".modal").show();
+                
+            }
+            function deleteUser(data) {
+                 var userId = userData[data].userId;
+                 var name = userData[data].name;
+                var userName = userData[data].userName;
+                var password = userData[data].password;
+                var address = userData[data].address;
+                var createdDate = userData[data].createdDate;
+                var User = {"name": name, "address": address, "userName": userName, "password": password,"userId":userId,"createdDate":createdDate};
+                $.ajax({
+                    url: "deleteUser",
+                    data: JSON.stringify(User),
+                    error: function (e) {
+                        console.log(e);
+                    },
+                    success: function (data) {
+                        if (data.result !== "success") {
+                        } else {
+                            window.location.href = "/homePage";
+                        }
+                        console.log(data);
+                    },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    type: "POST",
+                    cache: false,
+                    crossDomain: true
+                });
+            }
+            
+            $(".updateUser").click(function (e){
+                e.preventDefault();
+                 var name = $("#name").val();
+                var userName = $("#userName").val();
+                var password = $("#password").val();
+                var address = $("#address").val();
+                var userId = $("#userId").val();
+                var User = {"name": name, "address": address, "userName": userName, "password": password,"userId":userId};
+                $.ajax({
+                    url: "updateUser",
+                    data: JSON.stringify(User),
+                    error: function (e) {
+                        console.log(e);
+                    },
+                    success: function (data) {
+                        if (data.result !== "success") {
+                        } else {
+                            window.location.href = "/homePage";
+                        }
+                        console.log(data);
+                    },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    type: "POST",
+                    cache: false,
+                    crossDomain: true
+                });
+            });
+            
+            
+            
+        </script>
+    </body>
+</html>
